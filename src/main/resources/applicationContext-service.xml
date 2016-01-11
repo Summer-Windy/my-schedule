@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop 	  http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/tx 	  http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/task  
+		http://www.springframework.org/schema/task/spring-task-3.1.xsd "
+	default-lazy-init="false">
+
+	<context:annotation-config />
+	<!-- Enable @Transactional support -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- Enable @AspectJ support -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<!-- Activates scanning of @Service -->
+	<context:component-scan base-package="com.gongfutrip" />
+	<!-- 任务扫描配置 -->	
+	<task:annotation-driven scheduler="scheduler" />
+	<task:scheduler id="scheduler" pool-size="2" />
+	
+	<!-- remote service -->
+	<!-- <bean id="iacApi" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${service.hessian.url}/remote/iacapi" />
+		<property name="serviceInterface" value="com.gongfutrip.remote.IacApi" />
+		<property name="overloadEnabled" value="true" />
+		<property name="readTimeout" value="${hessian.readTimeout}" />
+	</bean> -->
+	 <!-- <bean name="/math" class="org.springframework.remoting.caucho.HessianServiceExporter">
+       <property name="service" ref="remoteAppOrderService"/>
+       <property name="serviceInterface" value="com.gongfutrip.mobile.parentOrder.api.IRemoteAppOrderService"/>
+    </bean> -->
+    
+    <!-- hessian调用 start -->
+	<bean id="iPassengerService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${service.hessian.mobile.url}/remote/iPassengerService" />
+		<property name="serviceInterface" value="com.gongfutrip.api.user.passenger.interfaces.IPassengerService" />
+	</bean>
+	
+	<bean id="iOrderLockTimeService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${service.hessian.mobile.url}/remote/iOrderLockTimeService" />
+		<property name="serviceInterface" value="com.gongfutrip.api.order.interfaces.IOrderLockTimeService" />
+	</bean>
+	<!-- hessian调用 end -->
+	
+	<bean class="com.gongfutrip.schedule.mobile.config.ScheduleConfig" name="scheduleConfig">
+		<property name="locations">
+	    	<list>
+	         <value>file:/var/server-config/schedule/data-access.properties</value>
+	    	</list>
+    	</property>
+	</bean>
+</beans>
